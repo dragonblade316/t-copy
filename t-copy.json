@@ -1,0 +1,6 @@
+[
+	{
+		"target": "src/main.rs",
+		"destination": "thing/nope.rs"
+	}
+]
