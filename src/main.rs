@@ -15,14 +15,14 @@ struct Movement {
 struct Args {
     /// target dirrectory
     #[arg(short, long)]
-    config: Option<PathBuf>,
+    target: Option<PathBuf>,
 
     /// output dirrectory
     #[arg(short, long)]
     output: PathBuf,
 
-    // #[arg(short, long, default_value="true")]
-    // destructive: bool
+    #[arg(short, long, action)]
+    destructive: bool
 }
 
 
@@ -31,7 +31,7 @@ fn main() -> Result<()> {
 
     let working_dir = env::current_dir()?;
 
-    let target_dir = match args.config {
+    let target_dir = match args.target {
         Some(c) => {
             if c.is_absolute() {
                 c
@@ -60,13 +60,13 @@ fn main() -> Result<()> {
         println!("Copying {:?} to {:?}", tpath, dpath);
 
         if !tpath.exists() {
-            eprintln!("{} not found", tpath.to_str().expect("non unicode paths not supported"));
+            eprintln!("{} not found", tpath.to_str().expect("non unicode paths not supported in errors"));
             continue;
         }
 
         if tpath.is_dir() {
-            if !dpath.exists() {
-                let _ = fs_extra::dir::create_all(dpath.clone(), false)?;
+            if !dpath.exists() || args.destructive {
+                let _ = fs_extra::dir::create_all(dpath.clone(), args.destructive)?;
             }
 
             let mut options = fs_extra::dir::CopyOptions::new();
@@ -79,8 +79,8 @@ fn main() -> Result<()> {
         if tpath.is_file() {
             let mut testpath = dpath.clone();
             testpath.pop();
-            if !testpath.exists() {
-                let _ = fs_extra::dir::create_all(testpath, false)?;
+            if !testpath.exists() || args.destructive {
+                let _ = fs_extra::dir::create_all(testpath, args.destructive)?;
             }
 
             let options = fs_extra::file::CopyOptions::new().overwrite(true);
