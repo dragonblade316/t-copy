@@ -13,14 +13,16 @@ struct Movement {
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Args {
-    /// target dirrectory
+    /// Target dirrectory
     #[arg(short, long)]
     target: Option<PathBuf>,
 
-    /// output dirrectory
+    /// Output dirrectory
     #[arg(short, long)]
     output: PathBuf,
-
+    
+    /// Any dirrectory t-copy interacts with will have all content erased before new content is
+    /// added.
     #[arg(short, long, action)]
     destructive: bool
 }
